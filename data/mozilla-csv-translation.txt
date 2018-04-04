@@ -1,0 +1,43 @@
+Translation:
+
+Field: 	I consider myself:
+0	Luddite
+1	Average User
+2	Technically Savvy
+3	Ultra Nerd
+
+Field: 	Thinking about a future in which so much of your world is connected to the internet leaves you feeling:
+0	Scared as hell
+1	A little wary
+2 	On the fence
+3	Cautiously optimistic
+4	Super excited!
+
+Field	What are you most excited about as we move toward a more digitally connected future?
+0	None of the above
+1	How much fun it will be
+2	How it will bring the world together
+3	How it will make us all smarter and better educated
+4	How easy it will make life
+5	Other (please specify)
+
+Field	What is your biggest fear as we move towards a more connected future?
+0	The loss of privacy
+1	We'll lose touch with one another
+2	I have no fears about a more connected future
+3	We'll be less safe
+4	Other (please specify)
+
+Field	Who is most responsible for protecting the online safety, privacy, and security of the connected apps and devices you own?
+0	The makers of those apps and devices should build safety and privacy into their products' features.
+1	It's up to me to protect myself online
+2	The government should create policies and rules to ensure these devices are safe and secure
+3	I honestly don't know
+
+Field	Who do you most trust to help you learn how to protect your safety, security and privacy online?
+0	My friends and family
+1	The government
+2	The media
+3	Non-profit organizations like Mozilla and Consumer Reports
+4	I just don't know who to trust
+5	The makers of connected devices and apps
