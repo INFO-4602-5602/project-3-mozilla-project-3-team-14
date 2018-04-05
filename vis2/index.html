@@ -1,22 +1,32 @@
 <html>
+
 <head>
-<title>Project 3, Vis 2</title>
-<link type="text/css" href="vis2.css" rel="stylesheet"></link>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/d3-array.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <title>Project 3, Vis #2</title>
+    <link type="text/css" href="vis2.css" rel="stylesheet"></link>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <!-- <script src="https://d3js.org/d3-geo.v1.min.js"></script> --> 
 </head>
 
 <body>
-    <div id="visThree">
-        <h1>Vis 2</h1>
-        <p>hover over a point or a line to see more information!</p>
-        <div id="vis2">
-            <div id="visualization-2"> </div>
+    <div id="visContainer">
+        <h1>Vis #2: Sentiment of a Connected Future by Country</h1>
+        <p>This visualization examines the major fears and excitements felt by the survey respondents from each country. In the world map, each country is colored by the most common fear that responders from that country have picked. This way, we can see overall regional differences in sentiments of a connected future.</p>
+        <p>Click on a country to select it and view all of the fears, the confidence in the results for that country (determined by the number of responses), and compare that country's responses to the global average responses.</p>
+        <div id="map"></div>
+        <div id="countryInfo">
+            <h3></h3>
+            <p></p>
+            <svg height="100" width="150"></svg>
         </div>
+    </div>
+
+    <div id="tooltip">
+        <p style="margin:0em;"></p>
     </div>
 
     <script type="text/javascript" src="vis2.js"></script>
 </body>
+
 </html>
