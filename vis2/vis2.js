@@ -12,8 +12,9 @@ var margin = {top: 40, right: 40, bottom: 40, left: 40};
 var width = 880 - margin.left - margin.right
 var height = 500 - margin.top - margin.bottom;
 var map_size = {width: 800, height: 420};
-var barchart_size = {margin: margin, width: 200, height: 150};
+var barchart_size = {margin: margin, width: 160, height: 150};
 var data;
+var geodata;
 
 // create color scale
 var color = d3.scaleOrdinal(d3.schemeCategory10).domain([0,1,2,3,4]);
@@ -28,10 +29,11 @@ var fearsMapping = [
     "Other (please specify)"];
 var exciteField = "What are you most excited about as we move toward a more digitally connected future?";
 var exciteMapping = [
-    "The loss of privacy",
-    "We'll lose touch with one another",
-    "I have no fears about a more connected future",
-    "We'll be less safe",
+    "None of the above", 
+    "How much fun it will be", 
+    "How it will bring the world together", 
+    "How it will make us all smarter and better educated", 
+    "How easy it will make life", 
     "Other (please specify)"];
 var attributeData = {
     'Feared': {
@@ -60,6 +62,37 @@ function main() {
         .defer(d3.csv, dataFile)
         /* execute this function when both above done! */
         .await(processData);
+
+    d3.selectAll(".menubutton")
+        .on("click", handleMenuClick)
+}
+
+function handleMenuClick(d, i) {
+    text = d3.select(this).text();
+    if (text == "Fears") {
+        attribute = "Feared";
+    } else {
+        attribute = "Excited";
+    }
+    updateMap(geodata, data, attribute);
+    d3.selectAll(".menubutton")
+        .style("background-color", "white");
+    d3.select(this)
+        .style("background-color", "gold");
+}
+
+function handleCountryMouseoverEvent(d, i) {
+    // outline on mousover
+    d3.select(this)
+      .style("stroke", "gold")
+      .style("stroke-width", "2px");
+    // make tooltip appear, set text
+    d3.select("body #tooltip")
+      .style("opacity", 0.9)
+      .style("left", (d3.event.pageX + 5) + "px")
+      .style("top", (d3.event.pageY + 5) + "px");
+    d3.select("body #tooltip p")
+      .text(d.properties.NAME);
 }
 
 function processData(error, geo, rawdata) {
@@ -70,12 +103,13 @@ function processData(error, geo, rawdata) {
         // rollup: replace indiv records within group by one record
         .rollup(sumarizeCountry)
         .object(rawdata);
+    geodata = geo;
 
     // remove loading text
     d3.select("#map h2").remove();
 
     // draw the map!
-    drawMap(geo, data);
+    drawMap(geo, data, "Feared");
 }
 
 function getCountryData(country) {
@@ -136,7 +170,7 @@ function sumarizeCountry(entries) {
 /* This function draws the world map projection, coloring each country
  * according to the given attribute */
 //function drawMap(data, attribute) {
-function drawMap(geojson, data) {
+function drawMap(geojson, data, attribute) {
     // projection: function that converts from long/lat to x/y
     var projection = d3.geoNaturalEarth1()
         .scale(150) // default scale is 150
@@ -166,7 +200,7 @@ function drawMap(geojson, data) {
         .append('path')
         .attr('d', generator)
         .style("fill", function(d) { 
-            return getCountryAttrColor(d.properties.NAME_LONG, 'Feared'); })
+            return getCountryAttrColor(d.properties.NAME_LONG, attribute); })
         .on("mouseover", handleCountryMouseoverEvent)
         .on("mouseout", handleCountryMouseoutEvent)
         .on("click", handleCountryClickEvent);
@@ -181,7 +215,29 @@ function drawMap(geojson, data) {
         .attr("class", "key")
         .attr("transform", "translate(12,320)")
         .call(legend);
+}
 
+function updateMap(geojson, data, attribute) {
+    var svg = d3.select('#map svg')
+
+    // draw countries
+    svg.select("g.country").selectAll('path')
+        .data(geojson.features)
+        .transition()
+        .style("fill", function(d) { 
+            return getCountryAttrColor(d.properties.NAME_LONG, attribute); })
+
+    var legend = d3.legendColor()
+        .shape('circle')
+        .scale(color)
+        .labels(fearsMapping);
+
+    // add a color key
+    svg.select("g.key").remove();
+    svg.append("g")
+        .attr("class", "key")
+        .attr("transform", "translate(12,320)")
+        .call(legend);
 }
 
 function handleCountryMouseoverEvent(d, i) {
@@ -254,17 +310,21 @@ function handleCountryClickEvent(d, i) {
     // make bar chart
     svg = d3.select("#countryInfo svg.fears");
     console.log(svg);
-    drawBarChart(svg, nums, 'Feared', fearsMapping);
+    drawBarChart(svg, nums, 'Feared', totalResponses);
     svg = d3.select("#countryInfo svg.excitements");
-    drawBarChart(svg, nums, 'Excited', exciteMapping);
+    drawBarChart(svg, nums, 'Excited', totalResponses);
 }
 
-function drawBarChart(svg, data, attribute) {
+/* This function draws a country-specific bar chart for the given
+ * attribute. */
+function drawBarChart(svg, data, attribute, total) {
+    // convert data into good format for d3 to build a bar chart
     thisData = objectToArray(nums[attribute], attributeData[attribute].answers.length);
-    var x = d3.scaleLinear().rangeRound([0, barchart_size.width]);
-    var y = d3.scaleLinear().rangeRound([barchart_size.height, 0]);
+    var x = d3.scaleLinear().range([0, barchart_size.width]);
+    var y = d3.scaleLinear().range([barchart_size.height, 0]);
     x.domain([0, d3.max(thisData, function(d) { return d.x; } )]);
-    y.domain([0, d3.max(thisData, function(d) { return d.y; } )]);
+    //y.domain([0, d3.max(thisData, function(d) { return d.y; } )]);
+    y.domain([0, 100]);
     bars = svg.select("g")
         .attr("transform", "translate(" + 
             barchart_size.margin.left + "," + 
@@ -272,52 +332,81 @@ function drawBarChart(svg, data, attribute) {
         .selectAll("rect")
         .data(thisData);
 
-    bars.enter().append("rect")
+    bars.enter()
+        .append("rect")
         .attr("class", "bar")
         .attr("x", function(d) { return x(d.x); })
-        .attr("y", function(d) { return y(d.y); })
+        .attr("y", function(d) { return y(d.y * 100 / total); })
         .attr("fill", function(d) { return color(d.x); })
-        .attr("width", "20")
-        .attr("height", function(d) { return barchart_size.height - y(d.y); });
+        .attr("width", "25")
+        .attr("height", function(d) { return barchart_size.height - y(d.y * 100 / total); })
 
     bars.transition()
         .duration(200)
-        .attr("class", "bar")
         .attr("x", function(d) { return x(d.x); })
-        .attr("y", function(d) { return y(d.y); })
+        .attr("y", function(d) { return y(d.y * 100 / total); })
         .attr("fill", function(d) { return color(d.x); })
-        .attr("width", "20")
-        .attr("height", function(d) { return barchart_size.height - y(d.y); });
+        .attr("width", "25")
+        .attr("height", function(d) { return barchart_size.height - y(d.y * 100 / total); });
 
-    // Add the X Axis
-    svg.append("g")
-      .attr("transform", "translate(" + barchart_size.margin.left + ", " + (barchart_size.height + barchart_size.margin.top) + ")")
-      .call(d3.axisBottom(x).ticks(x.length));
+    labels = svg.select("g").selectAll("text")
+        .data(thisData);
 
-    // Add the Y Axis
-    svg.append("g")
-      .attr("transform", "translate(" + barchart_size.margin.left + ", " + barchart_size.margin.top + ")")
-      .call(d3.axisLeft(y));
+    labels.enter()
+        .append("text")
+        .attr("class", "barlabel")
+        .text(function(d) { return attributeData[attribute].answers[d.x] })
+        .attr("transform", function(d) { 
+            cx = x(d.x) + barchart_size.margin.left + 10 - 40;
+            cy = 30 + y(d.y * 100 / total) - 40;
+            return "rotate(-45," + cx + "," + cy + ")"; })
+        .attr("y", function(d) { return 30 + y(d.y * 100 / total) - 40; })
+        .attr("x", function(d) { return x(d.x) + barchart_size.margin.left + 10 - 40; });
 
-    // add the text labels
-    svg.selectAll("text").remove();
-    svg.append("text") // X
-      .attr("class", "label")
-      .text("Most " + attribute)
-      .attr("x", barchart_size.width - 100)
-      .attr("y", barchart_size.height + barchart_size.margin.top + 15);
-    svg.append("text") // Y
-      .attr("class", "label")
-      .text("Percent")
-      .attr("transform", "rotate(-90)")
-      .attr("x", 30) //y after transform, neg = down
-      .attr("y", 100); // y after transform, neg = right
-    svg.append("text") // Title
-      .attr("class", "title")
-      .attr("y", 12)
-      .attr("x", 20)
-      .text(attributeData[attribute].title)
-      .style("font-weight", "bold");
+    labels.transition()
+        .duration(200)
+        .attr("transform", function(d) { 
+            cx = x(d.x) + barchart_size.margin.left + 10 - 40;
+            cy = 30 + y(d.y * 100 / total) - 40;
+            return "rotate(-45," + cx + "," + cy + ")"; })
+        .attr("y", function(d) { return 30 + y(d.y * 100 / total) - 40; })
+        .attr("x", function(d) { return x(d.x) + barchart_size.margin.left + 10 - 40; });
+
+    /* only need to do this part once. */
+    if (svg.selectAll("g").size() < 2) {
+      // Add the X Axis
+      /*
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + barchart_size.margin.left + ", " + (barchart_size.height + barchart_size.margin.top) + ")")
+        .call(d3.axisBottom(x)); */
+
+      // Add the Y Axis
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + barchart_size.margin.left + ", " + barchart_size.margin.top + ")")
+        .call(d3.axisLeft(y).ticks(5));
+
+      // add the text labels
+      svg.append("text") // X
+        .attr("class", "label")
+        .text("Most " + attribute)
+        .attr("x", barchart_size.width - 100)
+        .attr("y", barchart_size.height + barchart_size.margin.top + 15);
+      svg.append("text") // Y
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -(barchart_size.height/2 + 30)) //y after transform, neg = down
+        .attr("y", 12)  // y after transform, neg = right
+        .style("text-anchor", "middle")
+        .text("Percent");
+      svg.append("text") // Title
+        .attr("class", "label")
+        .attr("y", 12)
+        .attr("x", 20)
+        .text(attributeData[attribute].title)
+        .style("font-weight", "bold");
+    }
 }
 
 /* run the script! */

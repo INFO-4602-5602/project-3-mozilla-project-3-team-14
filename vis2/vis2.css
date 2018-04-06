@@ -1,6 +1,14 @@
 body {
 }
 
+.menubutton {
+  border:1px solid black;
+}
+
+.menubutton:hover {
+  background-color: lightblue !important;
+}
+
 #map {
   float:left;
 }
@@ -22,6 +30,11 @@ body {
 #countryInfo svg {
   margin-left:1em;
   margin-right:0em;
+}
+
+.barlabel {
+  font-size:8pt;
+  text-anchor:start;
 }
 
 #tooltip {

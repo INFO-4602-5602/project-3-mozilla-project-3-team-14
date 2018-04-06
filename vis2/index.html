@@ -13,12 +13,16 @@
         <p>This visualization examines the major fears and excitements felt by the survey respondents from each country. In the world map, each country is colored by the most common fear that responders from that country have picked. This way, we can see overall regional differences in sentiments of a connected future.</p>
         <p>Click on a country to select it and view all of the fears, the confidence in the results for that country (determined by the number of responses), and compare that country's responses to the global average responses.</p>
         <div id="map">
-          <h2>Loading Map...</h2>
+            <p>Menu Select: Paint map with: 
+                <span class="menubutton" id="fearbutton">Fears</span> or 
+                <span class="menubutton" id="excitebutton">Excitements</span>.
+            </p>
+            <h2>Loading Map...</h2>
         </div>
         <div id="countryInfo">
             <h3></h3>
             <p></p>
-            <svg class="fears" height="230" width="280"><g></g></svg>
+            <svg class="fears" height="230" width="280"><g></g></svg><br />
             <svg class="excitements" height="230" width="280"><g></g></svg>
         </div>
     </div>
