@@ -1,12 +1,36 @@
 body {
+  font-family: sans-serif;
+}
+
+#visContainer {
+  float:left;
+  width:1120;
+}
+
+.menu {
+  background-color:#ddd;
+  padding:0.5em;
+  margin-right:1em;
+  border:1px solid #555;
 }
 
 .menubutton {
   border:1px solid black;
+  padding-left:2px;
+  padding-right:2px;
 }
 
 .menubutton:hover {
   background-color: lightblue !important;
+}
+
+.key {
+  font-size:11pt;
+}
+
+.key text {
+  /* background-color: rgba(255, 255, 255, 0.5); */
+  background-color: green;
 }
 
 #map {

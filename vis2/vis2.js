@@ -16,9 +16,6 @@ var barchart_size = {margin: margin, width: 160, height: 150};
 var data;
 var geodata;
 
-// create color scale
-var color = d3.scaleOrdinal(d3.schemeCategory10).domain([0,1,2,3,4]);
-
 /* Strings for displaying visualization in human-readable format! */
 var fearField = "What is your biggest fear as we move towards a more connected future?";
 var fearsMapping = [
@@ -39,11 +36,13 @@ var attributeData = {
     'Feared': {
         'question': fearField, 
         'answers': fearsMapping, 
-        'title': "What's Your Biggest Fear?" },
+        'title': "What's Your Biggest Fear?",
+        'color': null },
     'Excited': {
         'question': exciteField, 
         'answers': exciteMapping,
-        'title': "What Are You Most Excited About?" }};
+        'title': "What Are You Most Excited About?",
+        'color': null }};
 
 /* Run everything! */
 function main() {
@@ -65,6 +64,13 @@ function main() {
 
     d3.selectAll(".menubutton")
         .on("click", handleMenuClick)
+
+    // create color scales
+    attributeData.Feared.color = d3.scaleOrdinal(d3.schemeCategory10)
+        .domain([0, 1, 2, 3, 4]);
+    attributeData.Excited.color = d3.scaleOrdinal(d3.schemeCategory10)
+        .domain([0, 1, 2, 3, 4, 5]);
+    //var color = d3.scaleOrdinal(d3.schemeCategory10).domain([0,1,2,3,4]);
 }
 
 function handleMenuClick(d, i) {
@@ -137,7 +143,7 @@ function getCountryAttrColor(country, attribute) {
                 max = props[i];
             }
         }
-        return color(max);
+        return attributeData[attribute].color(max);
     }
 }
 
@@ -207,8 +213,8 @@ function drawMap(geojson, data, attribute) {
 
     var legend = d3.legendColor()
         .shape('circle')
-        .scale(color)
-        .labels(fearsMapping);
+        .scale(attributeData[attribute].color)
+        .labels(attributeData[attribute].answers);
 
     // add a color key
     svg.append("g")
@@ -217,6 +223,7 @@ function drawMap(geojson, data, attribute) {
         .call(legend);
 }
 
+/* This function re-colors the map, coloring according to given attribute */
 function updateMap(geojson, data, attribute) {
     var svg = d3.select('#map svg')
 
@@ -224,19 +231,20 @@ function updateMap(geojson, data, attribute) {
     svg.select("g.country").selectAll('path')
         .data(geojson.features)
         .transition()
+        .duration(800)
         .style("fill", function(d) { 
             return getCountryAttrColor(d.properties.NAME_LONG, attribute); })
 
+    // add a color key
     var legend = d3.legendColor()
         .shape('circle')
-        .scale(color)
-        .labels(fearsMapping);
-
-    // add a color key
+        .scale(attributeData[attribute].color)
+        .labels(attributeData[attribute].answers);
     svg.select("g.key").remove();
     svg.append("g")
         .attr("class", "key")
-        .attr("transform", "translate(12,320)")
+        //.attr("transform", "translate(12,320)")
+        .attr("transform", "translate(12,300)")
         .call(legend);
 }
 
@@ -247,7 +255,7 @@ function handleCountryMouseoverEvent(d, i) {
       .style("stroke-width", "2px");
     // make tooltip appear, set text
     d3.select("body #tooltip")
-      .style("opacity", 0.9)
+      .style("opacity", 0.8)
       .style("left", (d3.event.pageX + 5) + "px")
       .style("top", (d3.event.pageY + 5) + "px");
     d3.select("body #tooltip p")
@@ -337,7 +345,7 @@ function drawBarChart(svg, data, attribute, total) {
         .attr("class", "bar")
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y * 100 / total); })
-        .attr("fill", function(d) { return color(d.x); })
+        .attr("fill", function(d) { return attributeData[attribute].color(d.x); })
         .attr("width", "25")
         .attr("height", function(d) { return barchart_size.height - y(d.y * 100 / total); })
 
@@ -345,7 +353,7 @@ function drawBarChart(svg, data, attribute, total) {
         .duration(200)
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y * 100 / total); })
-        .attr("fill", function(d) { return color(d.x); })
+        .attr("fill", function(d) { return attributeData[attribute].color(d.x); })
         .attr("width", "25")
         .attr("height", function(d) { return barchart_size.height - y(d.y * 100 / total); });
 
