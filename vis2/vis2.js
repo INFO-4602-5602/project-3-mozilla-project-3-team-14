@@ -36,12 +36,14 @@ var attributeData = {
     'Feared': {
         'question': fearField, 
         'answers': fearsMapping, 
+        'maptitle': "Most Common Fears of a Connected Future",
         'title': "What's Your Biggest Fear?",
         'color': null },
     'Excited': {
         'question': exciteField, 
         'answers': exciteMapping,
-        'title': "What Are You Most Excited About?",
+        'maptitle': "Most Common Reasons for Excitement in a Connected Future",
+        'title': "What're You Most Excited About?",
         'color': null }};
 
 /* Run everything! */
@@ -177,6 +179,10 @@ function sumarizeCountry(entries) {
  * according to the given attribute */
 //function drawMap(data, attribute) {
 function drawMap(geojson, data, attribute) {
+    // update map title
+    d3.select("#map h3")
+        .text(attributeData[attribute].maptitle);
+
     // projection: function that converts from long/lat to x/y
     var projection = d3.geoNaturalEarth1()
         .scale(150) // default scale is 150
@@ -226,6 +232,10 @@ function drawMap(geojson, data, attribute) {
 /* This function re-colors the map, coloring according to given attribute */
 function updateMap(geojson, data, attribute) {
     var svg = d3.select('#map svg')
+
+    // update map title
+    d3.select("#map h3")
+        .text(attributeData[attribute].maptitle);
 
     // draw countries
     svg.select("g.country").selectAll('path')
@@ -399,7 +409,7 @@ function drawBarChart(svg, data, attribute, total) {
       svg.append("text") // X
         .attr("class", "label")
         .text("Most " + attribute)
-        .attr("x", barchart_size.width - 100)
+        .attr("x", barchart_size.width - 60)
         .attr("y", barchart_size.height + barchart_size.margin.top + 15);
       svg.append("text") // Y
         .attr("class", "label")

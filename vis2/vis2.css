@@ -1,21 +1,47 @@
 body {
   font-family: sans-serif;
+  background-color:#ddd;
+}
+
+.clear {
+  clear:both;
 }
 
 #visContainer {
-  float:left;
-  width:1120;
+  width:1140px;
+  margin:0 auto;
+  padding:0 1em;
+  padding-bottom:2em;
+  border:1px solid black;
+  border-radius:5px;
+  background-color:#fff;
+}
+
+#visContainer h1 {
+  font-size:18pt;
+  margin-top:0.5em;
+}
+
+#description {
+  margin:0;
+  padding:0.5em;
+  border:1px solid black;
+  border-radius:5px;
 }
 
 .menu {
   background-color:#ddd;
   padding:0.5em;
   margin-right:1em;
+  margin-left:0.5em;
+  margin-top:0.5em;
   border:1px solid #555;
+  border-radius:5px;
 }
 
 .menubutton {
   border:1px solid black;
+  border-radius:2px;
   padding-left:2px;
   padding-right:2px;
 }
@@ -34,7 +60,11 @@ body {
 }
 
 #map {
+  padding:2px;
   float:left;
+  border:1px solid black;
+  border-radius:5px;
+  background-color:white;
 }
 
 #map .country path {
@@ -49,16 +79,37 @@ body {
 
 #countryInfo {
   float:left;
+  border:1px solid black;
+  border-radius:5px;
+  padding:1em;
+  margin-left:1em;
+  margin-bottom:0em;
+  padding-top:0em;
+  padding-bottom:0em;
+  text-align:center;
+  background-color:white;
 }
 
-#countryInfo svg {
-  margin-left:1em;
-  margin-right:0em;
+#countryInfo h3 {
+  margin:0em;
+}
+
+#countryInfo p {
+  margin:0em;
+  font-size:10pt;
+}
+
+#countryInfo .menu {
+  margin:0.5em;
 }
 
 .barlabel {
   font-size:8pt;
   text-anchor:start;
+}
+
+.label {
+  font-size:11pt;
 }
 
 #tooltip {
@@ -73,5 +124,6 @@ body {
   border: 1px; 
   border-style: solid; 
   border-color:black; 
+  border-radius: 5px;
   width:8em
 }
