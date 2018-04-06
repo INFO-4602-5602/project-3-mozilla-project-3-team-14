@@ -72,7 +72,6 @@ function main() {
         .domain([0, 1, 2, 3, 4]);
     attributeData.Excited.color = d3.scaleOrdinal(d3.schemeCategory10)
         .domain([0, 1, 2, 3, 4, 5]);
-    //var color = d3.scaleOrdinal(d3.schemeCategory10).domain([0,1,2,3,4]);
 }
 
 function handleMenuClick(d, i) {
@@ -146,6 +145,32 @@ function getCountryAttrColor(country, attribute) {
             }
         }
         return attributeData[attribute].color(max);
+    }
+}
+
+/* this function returns a color to fill the svg path for a country,
+ * based on the given attribute (maximum fears or excitements). */
+function getCountryAttrAnsColor(country, attribute, answer, colorscale) {
+    if (data[country] == undefined) {
+        console.log("Country not found");
+        console.log(country);
+        return "#ddd";
+    } else {
+        d = data[country][attribute];
+
+        var totalResponses = 0;
+        if (nums != null) {
+            for (prop in d) {
+                totalResponses += d[prop];
+            }
+        }
+
+        var percent = 0;
+        if (d[answer] != undefined) {
+            percent = d[answer] * 100 / totalResponses;
+        }
+
+        return colorscale(percent);
     }
 }
 
@@ -229,6 +254,44 @@ function drawMap(geojson, data, attribute) {
         .call(legend);
 }
 
+function updateSingleColorMap(geojson, attribute, answer) {
+    var svg = d3.select('#map svg')
+
+    // make color scale
+    pureColor = attributeData[attribute].color(answer);
+    console.log(pureColor);
+    var monoColor = d3.scaleLinear()
+        .domain([0, 100])
+        .interpolate(d3.interpolateRgb)
+        .range([d3.rgb("#ffffff"), d3.rgb(pureColor)]);
+
+    // update map title
+    d3.select("#map h3")
+        .text(attributeData[attribute].maptitle);
+    d3.select("#map h4")
+        .text("(Showing '" + attributeData[attribute].answers[answer] + "')");
+
+    // draw countries
+    svg.select("g.country").selectAll('path')
+        .data(geojson.features)
+        .transition()
+        .duration(800)
+        .style("fill", function(d) { 
+            return getCountryAttrAnsColor(d.properties.NAME_LONG, attribute, answer, monoColor); })
+
+    var legendLinear = d3.legendColor()
+        .shapeWidth(30)
+        .cells(6)
+        .orient("horizontal")
+        .scale(monoColor);
+    svg.select("g.key").remove();
+    g = svg.append("g")
+        .attr("class", "key")
+        .attr("transform", "translate(4,380)")
+        .call(legendLinear);
+
+}
+
 /* This function re-colors the map, coloring according to given attribute */
 function updateMap(geojson, data, attribute) {
     var svg = d3.select('#map svg')
@@ -236,6 +299,8 @@ function updateMap(geojson, data, attribute) {
     // update map title
     d3.select("#map h3")
         .text(attributeData[attribute].maptitle);
+    d3.select("#map h4")
+        .text("");
 
     // draw countries
     svg.select("g.country").selectAll('path')
@@ -285,15 +350,34 @@ function handleCountryMouseoutEvent(d, i) {
         .style("top", "0px");
 }
 
+
+function handleAnswerClick(d, i) {
+    updateSingleColorMap(geodata, d.attr, d.x);
+}
+
+function handleAnswerMouseoverEvent(d, i) {
+    // outline on mousover
+    d3.select(this)
+      .style("stroke", "gold")
+      .style("stroke-width", "2px");
+}
+
+function handleAnswerMouseoutEvent(d, i) {
+    d3.select(this)
+        .style("stroke", "none");
+        //.style("stroke-width", "1px");
+}
+
 /* This function takes in an associative array, and returns 
  * an array, required for use in D3 graphing the data */
-function objectToArray(obj, len) {
-    arr = [];
+function objectToArray(data, attr) {
+    var len = attributeData[attr].answers.length;
+    var arr = [];
     for (var i = 0; i < len; i++) {
-        arr.push({'x':i, 'y':0});
-        if (obj[i] != undefined) {
+        arr.push({'x':i, 'y':0, 'attr':attr});
+        if (data[attr][i] != undefined) {
             // property 'i' is present in object
-            arr[i].y = obj[i];
+            arr[i].y = data[attr][i];
         }
     }
 
@@ -337,7 +421,7 @@ function handleCountryClickEvent(d, i) {
  * attribute. */
 function drawBarChart(svg, data, attribute, total) {
     // convert data into good format for d3 to build a bar chart
-    thisData = objectToArray(nums[attribute], attributeData[attribute].answers.length);
+    thisData = objectToArray(nums, attribute);
     var x = d3.scaleLinear().range([0, barchart_size.width]);
     var y = d3.scaleLinear().range([barchart_size.height, 0]);
     x.domain([0, d3.max(thisData, function(d) { return d.x; } )]);
@@ -358,6 +442,9 @@ function drawBarChart(svg, data, attribute, total) {
         .attr("fill", function(d) { return attributeData[attribute].color(d.x); })
         .attr("width", "25")
         .attr("height", function(d) { return barchart_size.height - y(d.y * 100 / total); })
+        .on("click", handleAnswerClick)
+        .on("mouseover", handleAnswerMouseoverEvent)
+        .on("mouseout", handleAnswerMouseoutEvent);
 
     bars.transition()
         .duration(200)

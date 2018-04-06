@@ -10,9 +10,7 @@ We got together to brainstorm some ideas for research questions. We were inspire
 
 The first question requires a global map for a quick overview. Since the data is ordinal, different hues are used to encode the survey answers for each attribute. Perceptional "pop-out" lets users see countries which do not conform to the overall worldwide distribution, and perceptional ensemble methods let us quickly see the most common answer worldwide. Only one attribute can be viewed at a time, but a menu lets users switch to the other attribute.
 
-The second question (individual country responses) required displaying the country results for each categorical attribute (fears or excitements). From the map we can see the most common answer, but to see the breakdown within a country we have to have more detail. I debated between bar charts and pie charts to display the percentage of responses for each category. In the end, I decided on Bar Charts because this lets us compare across countries more easily (length is easier to judge length than area). Transitions help us track if each bar is shrinking or growing when a new country is clicked. 
-
-To answer these questions, I created an ordinal choropleth map of the world, with each country colored according to the attribute (fear or excitement) with the greatest number of responses. To handle uncertainty, ideally a confidence interval should be calculated per-country. But because each country's population varies, and because the survey was released in limited languages, I opted to go a simpler route and simply display the number of respondents from each country as a proxy to confidence.
+The second question is explored in two ways! First, we can view individual country responses for all attribute answers at the same time in the form of two bar graphs, one for each categorical attribute (fears or excitements). From the map we can see the most common answer, but to see the breakdown within a country we have to have more detail. I debated between bar charts and pie charts to display the percentage of responses for each category. In the end, I decided on Bar Charts because this lets us compare across countries more easily (length is easier to judge length than area). Transitions help us track if each bar is shrinking or growing when a new country is clicked. The second way we can compare individual country responses is by repainting the map. If you click on a bar in the bar graph, the map is repainted with a monochrome choroplath scale showing the degree that each country agreed with that attribute answer.
 
 I first built a mock-up using MS-Paint :D.
 Then, proceeded to construct the real thing using D3. This whole visualization was built by Brian Lubars. We divided work into separate visualizations, so each team-member would build a separate visualization.
@@ -29,6 +27,7 @@ Then, proceeded to construct the real thing using D3. This whole visualization w
   * As a country is hovered over: tooltips and gold outlines
   * Clicking a country displays bar charts and outlines it in gold
   * Menu lets users pick between coloring map with fears or excitements
+  * Clicking a bar in the bar graph will repaint the map, letting us observe to what degree each country agrees with that attribute answer
 * Uncertainty: weakly sort of done by displaying # of respondents, but not ideal admittedly.
 * perceptually-informed design: mentioned in the design process section
 * Semantic zoom: can view data at a world-level, and zoom into view at a country-level.
