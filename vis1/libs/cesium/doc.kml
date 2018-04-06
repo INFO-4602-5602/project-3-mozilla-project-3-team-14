@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+<Document>
+    <Camera>
+        <altitudeMode>absolute</altitudeMode>
+        <longitude>-80.215317</longitude>
+        <latitude>26.843521</latitude>
+        <altitude>306.388825</altitude>
+        <heading>48.980423</heading>
+        <roll>0.062101</roll>
+        <tilt>75.090492</tilt>
+    </Camera>
+</Document>
+</kml>

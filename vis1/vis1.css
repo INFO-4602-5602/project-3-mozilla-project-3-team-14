@@ -1,0 +1,61 @@
+/* body {
+  font-family: Monospace;
+  background-color: #f0f0f0;
+  margin: 0px;
+  overflow: hidden;
+} */
+
+#title{
+  position: absolute;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  top: 5px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  text-align: center;
+  align: center;
+  color: white;
+}
+
+body, #cesiumContainer{
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+#controlPanel {
+  position: absolute;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 100%;
+  width: 25%;
+  top: 5px;
+  left: 5px;
+  background: rgba(42, 42, 42, 0.25);
+  padding: 5px 8px;
+  border-radius: 5px;
+  color: white;
+}
+
+#welcome {
+  margin : auto;
+  position : relative;
+  text-align: center;
+}
+
+#description {
+  margin : auto;
+  position : relative;
+  text-align: center;
+}
+
+#list {
+  margin : auto;
+  position : relative;
+}

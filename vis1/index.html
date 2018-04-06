@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8">
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Mozilla Survey Data</title>
+		<script src="libs/cesium/Build/Cesium/Cesium.js"></script>
+    <style>
+        @import url(libs/cesium/Build/Cesium/Widgets/widgets.css);
+    </style>
+    <link rel="stylesheet" type="text/css" href="vis1.css">
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id="title">How Countries Feel about a More Connected Future</div>
+<div id="controlPanel">
+  <p id="welcome">Welcome to a Visualization on Mozilla Survey Data!<br></br></p>
+  <p id="description">The coloring of each of the countries depicts the
+    way most of the people in that country feel about a more connected Future.
+    The legend is shown below.  Clicking on a country will display the number
+    of total surveys submitted by that country.  The exact survey prompt posed
+    to the user is as followed. "Thinking about a future in which so much of
+    your world is connected to the internet leaves you feeling"
+  <br></br>
+  </p>
+  <ul id="list">
+    <li>Orange: Scared as hell</li>
+    <li>Blue: A little wary</li>
+    <li>Green: On the fence</li>
+    <li>Purple: Cautiously optimistic</li>
+    <li>Red: Super excited!</li>
+    <li>Pink: No Survey Data</li>
+  </ul>
+</div>
+<script>
+	function startup(Cesium){
+		Cesium.BingMapsApi.defaultKey = 'Amy0TYCEOzERAkBhQ34rbSvm2xXHkEFqoe1j8kv7zYmPzMJNXPZ1xedwyKe9y10x';
+		  var viewer = new Cesium.Viewer('cesiumContainer', {
+        timeline: false,
+        animation: false,
+        navigationHelpButton: false
+      });
+			var ds = viewer.dataSources.add(Cesium.GeoJsonDataSource.load('data/countries.geojson'));
+	};
+	if (typeof Cesium !== "undefined") {
+    startup(Cesium);
+	} else if (typeof require === "function") {
+	    require(["Cesium"], startup);
+	}
+</script>
+</body>
+</html>
