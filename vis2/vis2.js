@@ -12,19 +12,36 @@ var margin = {top: 40, right: 40, bottom: 40, left: 40};
 var width = 880 - margin.left - margin.right
 var height = 500 - margin.top - margin.bottom;
 var map_size = {width: 800, height: 420};
-var svg_size = {margin: margin, width: width, height: height};
+var barchart_size = {margin: margin, width: 200, height: 150};
 var data;
 
 // create color scale
-var color = d3.scaleOrdinal(d3.schemeCategory10);
+var color = d3.scaleOrdinal(d3.schemeCategory10).domain([0,1,2,3,4]);
 
+/* Strings for displaying visualization in human-readable format! */
 var fearField = "What is your biggest fear as we move towards a more connected future?";
 var fearsMapping = [
     "The loss of privacy", 
     "We'll lose touch with one another", 
     "I have no fears about a more connected future", 
-    "We'll be less safe", "Other (please specify)"];
+    "We'll be less safe", 
+    "Other (please specify)"];
 var exciteField = "What are you most excited about as we move toward a more digitally connected future?";
+var exciteMapping = [
+    "The loss of privacy",
+    "We'll lose touch with one another",
+    "I have no fears about a more connected future",
+    "We'll be less safe",
+    "Other (please specify)"];
+var attributeData = {
+    'Feared': {
+        'question': fearField, 
+        'answers': fearsMapping, 
+        'title': "What's Your Biggest Fear?" },
+    'Excited': {
+        'question': exciteField, 
+        'answers': exciteMapping,
+        'title': "What Are You Most Excited About?" }};
 
 /* Run everything! */
 function main() {
@@ -53,8 +70,11 @@ function processData(error, geo, rawdata) {
         // rollup: replace indiv records within group by one record
         .rollup(sumarizeCountry)
         .object(rawdata);
-    console.log(data)
 
+    // remove loading text
+    d3.select("#map h2").remove();
+
+    // draw the map!
     drawMap(geo, data);
 }
 
@@ -117,9 +137,7 @@ function sumarizeCountry(entries) {
  * according to the given attribute */
 //function drawMap(data, attribute) {
 function drawMap(geojson, data) {
-    console.log(geojson);
     // projection: function that converts from long/lat to x/y
-    //var projection = d3.geoEquirectangular()
     var projection = d3.geoNaturalEarth1()
         .scale(150) // default scale is 150
         .translate([map_size.width / 2, (map_size.height / 2)])
@@ -155,8 +173,8 @@ function drawMap(geojson, data) {
 
     var legend = d3.legendColor()
         .shape('circle')
-        .labels(fearsMapping)
-        .scale(color);
+        .scale(color)
+        .labels(fearsMapping);
 
     // add a color key
     svg.append("g")
@@ -193,6 +211,21 @@ function handleCountryMouseoutEvent(d, i) {
         .style("top", "0px");
 }
 
+/* This function takes in an associative array, and returns 
+ * an array, required for use in D3 graphing the data */
+function objectToArray(obj, len) {
+    arr = [];
+    for (var i = 0; i < len; i++) {
+        arr.push({'x':i, 'y':0});
+        if (obj[i] != undefined) {
+            // property 'i' is present in object
+            arr[i].y = obj[i];
+        }
+    }
+
+    return arr;
+}
+
 activeCountryItem = null;
 /* function to handle the clicking of a country. Transition that
  * country to active state: 
@@ -219,20 +252,72 @@ function handleCountryClickEvent(d, i) {
     d3.select("#countryInfo p")
         .text("Total Responses: " + totalResponses);
     // make bar chart
-    svg = d3.select("#countryInfo svg")
-    var x = d3.scaleLinear().rangeRound([0, 150]);
-    var y = d3.scaleLinear().rangeRound([100, 0]);
-    x.domain(fearsMapping);
-    y.domain([0, d3.max(data, function(d) { return d; } )]);
-    svg.append("g")
-        .selectAll(".bar")
-        .data(nums['Feared'])
-        .enter().append("rect")
+    svg = d3.select("#countryInfo svg.fears");
+    console.log(svg);
+    drawBarChart(svg, nums, 'Feared', fearsMapping);
+    svg = d3.select("#countryInfo svg.excitements");
+    drawBarChart(svg, nums, 'Excited', exciteMapping);
+}
+
+function drawBarChart(svg, data, attribute) {
+    thisData = objectToArray(nums[attribute], attributeData[attribute].answers.length);
+    var x = d3.scaleLinear().rangeRound([0, barchart_size.width]);
+    var y = d3.scaleLinear().rangeRound([barchart_size.height, 0]);
+    x.domain([0, d3.max(thisData, function(d) { return d.x; } )]);
+    y.domain([0, d3.max(thisData, function(d) { return d.y; } )]);
+    bars = svg.select("g")
+        .attr("transform", "translate(" + 
+            barchart_size.margin.left + "," + 
+            barchart_size.margin.top + ")")
+        .selectAll("rect")
+        .data(thisData);
+
+    bars.enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { return x(d); })
-        .attr("y", function(d) { return y(d); })
+        .attr("x", function(d) { return x(d.x); })
+        .attr("y", function(d) { return y(d.y); })
+        .attr("fill", function(d) { return color(d.x); })
         .attr("width", "20")
-        .attr("height", function(d) { return 100 - y(d); });
+        .attr("height", function(d) { return barchart_size.height - y(d.y); });
+
+    bars.transition()
+        .duration(200)
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.x); })
+        .attr("y", function(d) { return y(d.y); })
+        .attr("fill", function(d) { return color(d.x); })
+        .attr("width", "20")
+        .attr("height", function(d) { return barchart_size.height - y(d.y); });
+
+    // Add the X Axis
+    svg.append("g")
+      .attr("transform", "translate(" + barchart_size.margin.left + ", " + (barchart_size.height + barchart_size.margin.top) + ")")
+      .call(d3.axisBottom(x).ticks(x.length));
+
+    // Add the Y Axis
+    svg.append("g")
+      .attr("transform", "translate(" + barchart_size.margin.left + ", " + barchart_size.margin.top + ")")
+      .call(d3.axisLeft(y));
+
+    // add the text labels
+    svg.selectAll("text").remove();
+    svg.append("text") // X
+      .attr("class", "label")
+      .text("Most " + attribute)
+      .attr("x", barchart_size.width - 100)
+      .attr("y", barchart_size.height + barchart_size.margin.top + 15);
+    svg.append("text") // Y
+      .attr("class", "label")
+      .text("Percent")
+      .attr("transform", "rotate(-90)")
+      .attr("x", 30) //y after transform, neg = down
+      .attr("y", 100); // y after transform, neg = right
+    svg.append("text") // Title
+      .attr("class", "title")
+      .attr("y", 12)
+      .attr("x", 20)
+      .text(attributeData[attribute].title)
+      .style("font-weight", "bold");
 }
 
 /* run the script! */

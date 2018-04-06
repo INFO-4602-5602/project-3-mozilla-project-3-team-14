@@ -19,6 +19,11 @@ body {
   float:left;
 }
 
+#countryInfo svg {
+  margin-left:1em;
+  margin-right:0em;
+}
+
 #tooltip {
   opacity: 0; 
   position: absolute; 
