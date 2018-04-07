@@ -15,12 +15,13 @@ class MozillaSurveyData():
     """
     Class that contains the functions needed to read in a csv file and filter it to provide data for a visualization
     """
-    def __init__(self, filename='../data/mozilla-filt-coded.csv', filename2='countries_old.geojson'):
+    def __init__(self, filename='../../data/mozilla-filt-coded.csv', filename2='countries_old.geojson'):
         self.moz_data = None
         self.country_data = None
         self.header = []
         self.filename = filename
         self.filename2 = filename2
+        self.coordinates = {}
 
     """
     Function that opens up the csv file and reads in the data into a large dict
@@ -28,6 +29,7 @@ class MozillaSurveyData():
     def read_data(self):
         self.moz_data = pd.read_csv(self.filename, encoding="ISO-8859-1")
         self.country_data = gpd.read_file(self.filename2)
+        self.pd_json = pd.read_json(self.filename2)
 
     """
     Function that formats the data by adding new data to the original geojson file
@@ -78,6 +80,10 @@ class MozillaSurveyData():
                 self.country_data['description'][i] = 'Number of Survey Submitted: undefined'
 
         # Change the altitude of the coordinates
+        for i, item in enumerate(self.pd_json['features']):
+            self.coordinates[self.pd_json['features'][i]['properties']['name']] = self.pd_json['features'][i]['geometry']['coordinates']
+
+        
 
     """
     Helper function to generate a description
