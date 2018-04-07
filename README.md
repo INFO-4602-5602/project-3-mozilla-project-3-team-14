@@ -1,13 +1,13 @@
 # Project 3 Team 14
 ## Team Roles
-Josiah Buxton - Visualization 1
-Brian Lubars - Visualization 2
-Tom Slesinger - Visualization 3
-Ben Niu - Visualization 4
+* Josiah Buxton - Visualization 1
+* Brian Lubars - Visualization 2
+* Tom Slesinger - Visualization 3
+* Ben Niu - Visualization 4
 
 ## Running the Project
 1. Launch a server in the root directory: `project-3-mozilla-project-3-team-14> python3 -m http.server 8000`
-2. http://localhost:8000/vis2/index.html
+2. http://localhost:8000/index.html
 
 # Visualization 1
 Visualization 1 is a depiction of the way countries feel about a more connected future.  It uses the Mozilla survey data and there are a few stages in the design process that are laid out below.
